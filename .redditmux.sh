@@ -11,4 +11,6 @@ cd reddit_client_with_python_vim_praw
 tmux split-window -v
 tmux split-window -h
 cd reddit_client_with_python_vim_praw
-#vim input.txt
+vim input.txt
+tmux select-pane -t 0
+vim output.txt
