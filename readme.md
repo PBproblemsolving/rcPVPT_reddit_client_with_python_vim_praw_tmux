@@ -3,7 +3,7 @@
 3. fill in your .redditmux.sh with your env activator command
 4. $ sh .redditmux.sh
 5. ????
-7. command with reader.<cmd> and reload "out_file"s with ":e"
+7. command with reader.<cmd>, reload "out_file"s with ":e", write content in "input.txt"
 6. ENJOY
 
 One can cast it with Fire 
