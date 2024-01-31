@@ -72,7 +72,7 @@ def submission_coms(subs_id, out_file='output.txt'):
                 print(e)
     with open(out_file, 'w') as f:
         f.write(f"{c_submission.name}: \n \
-                {c_submission.selftext or c_submission.url}\n")
+                {c_submission.selftext or c_submission.url}\n ---\n")
         iter_coms(comments, 0)
 
 def _reply(to_whom):

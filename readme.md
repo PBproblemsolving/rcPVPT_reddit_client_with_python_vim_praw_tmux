@@ -10,4 +10,4 @@ One can cast it with Fire
 '''
 $ python reader.py
 '''
-I prefer "import reader" in python interactive session, cause sessions provide function outcompleting and it comes handy if one would want to use praw directly by issuing reader.ruser.<cmd>
+I prefer "import reader" in python interactive session, cause sessions provide function autocompleting and that comes handy if one would want to use praw directly by issuing reader.ruser.<cmd>
