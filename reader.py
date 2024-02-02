@@ -18,17 +18,22 @@ _submission_attrs_dict = {key: _default_transformers
 _submission_attrs_dict['id']={'string_template':"<<{}>>"}
 _submission_attrs_dict['created_utc']={'lambdaf':lambda x: _stamptostring(x)}
 _submission_attrs_dict['spoiler']={'string_template':'spoiler: {}'}
-_submission_attrs_dict['num_comments']={'string_template':"cmnts: {}"}
+_submission_attrs_dict['num_comments']={'string_template':"\ncmnts: {}"}
+_submission_attrs_dict['title']={'string_template':"\n{}"}
 
 def _attrs_dict_factory(attrs_iter):
     return {key: {} for key in attrs_iter}
 
 def subreddit_submissions(sub_name, out_file='output.txt', 
                    hot_new='hot', limit: int=20):
-    if hot_new == 'new':    
-        sub = ruser.subreddit(sub_name).new(limit=limit)
-    if hot_new == 'hot':
-        sub = ruser.subreddit(sub_name).hot(limit=limit)
+    try:
+        #for example: sub_name=reader.ruser.front.hot
+        sub = sub_name(limit=limit)
+    except TypeError:
+        if hot_new == 'new':    
+            sub = ruser.subreddit(sub_name).new(limit=limit)
+        if hot_new == 'hot':
+            sub = ruser.subreddit(sub_name).hot(limit=limit)
     with open(out_file, 'w') as f:
         for s in sub:
             s = ruser.submission(s)
