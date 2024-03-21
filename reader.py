@@ -10,11 +10,13 @@ def _stamptostring(timestamp):
 def _attr_transformer(attr_value, string_template="{}", lambdaf= lambda x: x):
     return string_template.format(lambdaf(attr_value))
 
-_submission_attrs = ('id', 'author', 'created_utc', 'title', 'num_comments', 
-                    'score', 'upvote_ratio', 'spoiler') 
+_submission_attrs = ('id', 'author', 'created_utc', 'subreddit', 'title', 
+                     'num_comments', 'score', 'upvote_ratio', 'spoiler') 
 _default_transformers = {}
 _submission_attrs_dict = {key: _default_transformers 
                           for key in _submission_attrs}
+_submission_attrs_dict['subreddit']={'string_template':"r/{}", 'lambdaf': 
+                                     lambda x: getattr(x, 'display_name', "-")}
 _submission_attrs_dict['id']={'string_template':"<<{}>>"}
 _submission_attrs_dict['created_utc']={'lambdaf':lambda x: _stamptostring(x)}
 _submission_attrs_dict['spoiler']={'string_template':'spoiler: {}'}
