@@ -86,7 +86,7 @@ def _reply(to_whom):
         print('you are replying to:')
         print(details)
         print('with such content:')
-        with open('input.txt', 'r') as f:
+        with open('input.md', 'r') as f:
             content = f.read()
         print(content)
         decision = input("do you want to proceed? y for yes: ")
@@ -96,6 +96,26 @@ def _reply(to_whom):
         else:
             print('aborted')
     return inner   
+
+def create_submission(subreddit, title, url=None):
+    subreddit = ruser.subreddit(subreddit)
+    with open('input.md', 'r') as f:
+            selftext = f.read()
+    print('you are submitting to:')
+    print(subreddit.display_name, subreddit.public_description, sep='\n')
+    print('with such content:')
+    print(title, url if url else selftext, sep='\n')
+    decision = input("do you want to proceed? y for yes: ")
+    if decision == 'y':
+        if url:
+            subm = subreddit.submit(title, url=url)
+            print(subm.title, subm.id, subm.subreddit, subm.url, sep='\n')
+        else:
+            subm = subreddit.submit(title, selftext=selftext)
+            print(subm.title, subm.id, subm.subreddit, subm.body, sep='\n')
+    else:
+        print('aborted')
+
 
 @_reply
 def reply_comment(comment_id):
@@ -111,6 +131,8 @@ def reply_submission(submission_id):
 def reply_message(message_id):
     obj = ruser.inbox.message(message_id)
     return obj, f"{obj.id}, {obj.fullname} | {obj.body}"
+
+
 
 if __name__ == '__main__':
     fire.Fire()
