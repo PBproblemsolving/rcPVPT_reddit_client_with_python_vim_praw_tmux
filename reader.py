@@ -1,6 +1,6 @@
 from credentials import ruser
 from praw.models import Submission
-import fire
+#import fire
 import datetime
 
 
@@ -136,5 +136,5 @@ def reply_message(message_id):
 
 
 
-if __name__ == '__main__':
-    fire.Fire()
+#if __name__ == '__main__':
+#    fire.Fire()
