@@ -5,7 +5,7 @@ import datetime
 
 
 def _stamptostring(timestamp):
-    return datetime.datetime.utcfromtimestamp(timestamp)
+    return str(datetime.datetime.utcfromtimestamp(timestamp))
 
 def _attr_transformer(attr_value, string_template="{}", lambdaf= lambda x: x):
     return string_template.format(lambdaf(attr_value))
@@ -23,8 +23,8 @@ _submission_attrs_dict['spoiler']={'string_template':'spoiler: {}'}
 _submission_attrs_dict['num_comments']={'string_template':"\ncmnts: {}"}
 _submission_attrs_dict['title']={'string_template':"\n{}"}
 
-def _attrs_dict_factory(attrs_iter):
-    return {key: {} for key in attrs_iter}
+def _attrs_dict_factory(attrs_iter, value):
+    return {key: value for key in attrs_iter}
 
 def subreddit_submissions(sub_name, out_file='output.txt', 
                    hot_new='hot', limit: int=20):
@@ -47,8 +47,8 @@ def subreddit_submissions(sub_name, out_file='output.txt',
             f.write("; ".join(line_to_write()))
             f.write("\n")
 
-_comment_attrs = ('id', 'author', 'parent_id', 'body')
-_comment_attrs_dict = _attrs_dict_factory(_comment_attrs)
+_comment_attrs = ('id_created_str', 'author', 'parent_id', 'body')
+_comment_attrs_dict = _attrs_dict_factory(_comment_attrs, {})
 
 def submission_coms(subs_id, out_file='output.txt'):
     c_submission = ruser.submission(subs_id)
@@ -56,6 +56,8 @@ def submission_coms(subs_id, out_file='output.txt'):
     def iter_coms(comments, tabs):
         tabsstr = tabs*'\t'
         for c in comments:
+            setattr(c, 'id_created_str', 
+                    c.id + '; ' + _stamptostring(c.created_utc))
             def line_to_write():
                 for attr in _comment_attrs:
                     yield tabsstr + _attr_transformer(getattr(c, attr, "-"),
@@ -78,8 +80,11 @@ def submission_coms(subs_id, out_file='output.txt'):
             except Exception as e:
                 print(e)
     with open(out_file, 'w') as f:
-        f.write(f"{c_submission.name}: \n \
-                {c_submission.selftext or c_submission.url}\n---\n")
+        f.write(f"""{c_submission.name};\
+                at {_stamptostring(c_submission.created_utc)};\
+                by {c_submission.author.name}\n
+                {c_submission.title}\n
+                {c_submission.selftext or c_submission.url}\n---\n""")
         iter_coms(comments, 0)
 
 def _reply(to_whom):
@@ -105,8 +110,8 @@ def create_submission(subreddit, title, url=None):
             selftext = f.read()
     print('you are submitting to:')
     print(subreddit.display_name, subreddit.public_description, sep='\n')
-    print('with such content:')
-    print(title, url if url else selftext, sep='\n')
+    print("*******", 'with such content:', sep='\n')
+    print(title, url or selftext, sep='\n')
     decision = input("do you want to proceed? y for yes: ")
     if decision == 'y':
         if url:
@@ -114,7 +119,7 @@ def create_submission(subreddit, title, url=None):
             print(subm.title, subm.id, subm.subreddit, subm.url, sep='\n')
         else:
             subm = subreddit.submit(title, selftext=selftext)
-            print(subm.title, subm.id, subm.subreddit, subm.body, sep='\n')
+            print(subm.title, subm.id, subm.subreddit, subm.selftext, sep='\n')
     else:
         print('aborted')
 
