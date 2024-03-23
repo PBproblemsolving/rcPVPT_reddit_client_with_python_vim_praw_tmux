@@ -57,14 +57,19 @@ def subreddit_submissions(sub_name, output=stdout,
 _comment_attrs = ('id_created_str', 'author', 'parent_id', 'body')
 _comment_attrs_dict = _attrs_dict_factory(_comment_attrs, {})
 
+a = praw.models.S
+
 def submission_coms(subs_id, output='output.txt'):
     c_submission = ruser.submission(subs_id)
     comments = c_submission.comments
     def iter_coms(comments, tabs):
         tabsstr = tabs*'\t'
         for c in comments:
-            setattr(c, 'id_created_str', 
-                    c.id + '; ' + _stamptostring(c.created_utc))
+            try:
+                setattr(c, 'id_created_str', 
+                        c.id + '; ' + _stamptostring(c.created_utc))
+            except AttributeError:
+                pass
             def line_to_write():
                 for attr in _comment_attrs:
                     yield tabsstr + _attr_transformer(getattr(c, attr, "-"),
