@@ -2,6 +2,7 @@ from credentials import ruser
 from praw.models import Submission
 #import fire
 import datetime
+from sys import stdout
 
 
 def _stamptostring(timestamp):
@@ -26,7 +27,7 @@ _submission_attrs_dict['title']={'string_template':"\n{}"}
 def _attrs_dict_factory(attrs_iter, value):
     return {key: value for key in attrs_iter}
 
-def subreddit_submissions(sub_name, out_file='output.txt', 
+def subreddit_submissions(sub_name, output=stdout, 
                    hot_new='hot', limit: int=20):
     try:
         #for example: sub_name=reader.ruser.front.hot
@@ -36,21 +37,27 @@ def subreddit_submissions(sub_name, out_file='output.txt',
             sub = ruser.subreddit(sub_name).new(limit=limit)
         if hot_new == 'hot':
             sub = ruser.subreddit(sub_name).hot(limit=limit)
-    with open(out_file, 'w') as f:
-        for s in sub:
-            s = ruser.submission(s)
-            def line_to_write():
-                 for attr in _submission_attrs:
-                    yield _attr_transformer(getattr(s, attr, "-"),
-                                           **_submission_attrs_dict.get(attr))
+    try: 
+        output = open(output, 'w')
+    except TypeError:
+        pass
 
-            f.write("; ".join(line_to_write()))
-            f.write("\n")
+    for s in sub:
+        s = ruser.submission(s)
+        def line_to_write():
+             for attr in _submission_attrs:
+                yield _attr_transformer(getattr(s, attr, "-"),
+                                       **_submission_attrs_dict.get(attr))
+
+        output.write("; ".join(line_to_write()))
+        output.write("\n")
+    if output != stdout:
+        output.close()
 
 _comment_attrs = ('id_created_str', 'author', 'parent_id', 'body')
 _comment_attrs_dict = _attrs_dict_factory(_comment_attrs, {})
 
-def submission_coms(subs_id, out_file='output.txt'):
+def submission_coms(subs_id, output='output.txt'):
     c_submission = ruser.submission(subs_id)
     comments = c_submission.comments
     def iter_coms(comments, tabs):
@@ -79,7 +86,7 @@ def submission_coms(subs_id, out_file='output.txt'):
                     iter_coms(c.comments(), tabs)
             except Exception as e:
                 print(e)
-    with open(out_file, 'w') as f:
+    with open(output, 'w') as f:
         f.write(f"""{c_submission.name};\
                 at {_stamptostring(c_submission.created_utc)};\
                 by {c_submission.author.name}\n
