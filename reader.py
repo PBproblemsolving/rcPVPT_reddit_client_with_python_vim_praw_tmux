@@ -69,8 +69,8 @@ def submission_coms(subs_id, output='output.txt'):
                 for attr in _comment_attrs:
                     yield tabsstr + _attr_transformer(getattr(c, attr, "-"),
                                            **_comment_attrs_dict.get(attr))
-            f.write("\n".join(line_to_write()))
-            f.write("\n---\n")
+            output.write("\n".join(line_to_write()))
+            output.write("\n---\n")
             try:
                 replies = c.replies
                 iter_coms(replies, tabs+1)
@@ -86,13 +86,21 @@ def submission_coms(subs_id, output='output.txt'):
                     iter_coms(c.comments(), tabs)
             except Exception as e:
                 print(e)
-    with open(output, 'w') as f:
-        f.write(f"""{c_submission.name};\
-                at {_stamptostring(c_submission.created_utc)};\
-                by {c_submission.author.name}\n
-                {c_submission.title}\n
-                {c_submission.selftext or c_submission.url}\n---\n""")
-        iter_coms(comments, 0)
+    try: 
+        output = open(output, 'w')
+    except TypeError:
+        pass
+
+    output.write(f"""{c_submission.name};\
+            at {_stamptostring(c_submission.created_utc)};\
+            by {c_submission.author.name}\n
+            {c_submission.title}\n
+            {c_submission.selftext or c_submission.url}\n---\n""")
+    iter_coms(comments, 0)
+
+    if output != stdout:
+        output.close()
+
 
 def _reply(to_whom):
     def inner(*args):
