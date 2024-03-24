@@ -115,9 +115,9 @@ def submission_coms(subs_id, output='output.txt'):
         output.close()
 
 
-def _reply(to_whom):
+def _reply(to_what):
     def inner(*args):
-        reply_object, details = to_whom(*args)
+        reply_object, details = to_what(*args)
         print('you are replying to:')
         print(details)
         print('with such content:')
