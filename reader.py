@@ -1,5 +1,5 @@
 from credentials import ruser
-from praw.models import Submission
+from praw.models.reddit.subreddit import SubredditStream
 #import fire
 import datetime
 from sys import stdout
@@ -27,12 +27,21 @@ _submission_attrs_dict['title']={'string_template':"\n{}"}
 def _attrs_dict_factory(attrs_iter, value):
     return {key: value for key in attrs_iter}
 
-def subreddit_submissions(sub_name, output=stdout, 
-                   hot_new='hot', limit: int=20):
+def subreddit_submissions(sub_name, output=stdout, hot_new='hot', 
+                          limit: int=20, stream=False, skip_existing=True):
     try:
-        #for example: sub_name=reader.ruser.front.hot
-        sub = sub_name(limit=limit)
-    except TypeError:
+        if stream:
+            try:
+                sub_name = ruser.subreddit(sub_name)
+            except AttributeError as e:
+                pass
+            #for example: sub_name=reader.ruser.front
+            sub = SubredditStream(sub_name).submissions(
+                    skip_existing=skip_existing)
+        else:
+            #for example: sub_name=reader.ruser.front.hot
+            sub = sub_name(limit=limit)
+    except TypeError as e:
         if hot_new == 'new':    
             sub = ruser.subreddit(sub_name).new(limit=limit)
         if hot_new == 'hot':
@@ -57,7 +66,6 @@ def subreddit_submissions(sub_name, output=stdout,
 _comment_attrs = ('id_created_str', 'author', 'parent_id', 'body')
 _comment_attrs_dict = _attrs_dict_factory(_comment_attrs, {})
 
-a = praw.models.S
 
 def submission_coms(subs_id, output='output.txt'):
     c_submission = ruser.submission(subs_id)
