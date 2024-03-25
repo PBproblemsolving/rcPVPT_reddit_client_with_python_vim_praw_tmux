@@ -2,7 +2,7 @@
 2. fill in 'credentials.py' or and before get them at old.reddit.com/prefs/apps  
 4. $ sh .redditmux.sh  
 5. ????  
-7. command with reader.<cmd>, reload "output" file with ":e", or pass a stdout, write content in "input.md"  
+7. command with reader.<cmd>, reload "output" file with ":e", or write to a stdout, write content in "input.md"  
 6. ENJOY  
 
 One can cast it with Fire // now, on default commented out  
